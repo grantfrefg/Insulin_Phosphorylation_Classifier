@@ -1,0 +1,108 @@
+---
+title: "Stat Assignment 2"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#STAT5003 Assignment 2
+
+###Loading and Subsetting the Labelled Data
+```{r}
+#Read Data in
+setwd("/Users/seanlolwut/Downloads/Final project/Datasets")
+data <- read.csv('statdata.csv', header = T)
+
+#See structure of data
+str(data)
+
+#Subset labelled Data
+AKTlabelled <- data[data$Label == 'AKT', ]
+mTORlabelled <- data[data$Label == 'mTOR', ]
+
+#Check dimensions of labelled data
+dim(AKTlabelled)
+dim(mTORlabelled)
+
+
+```
+
+
+###Looking at Amino Acid Frequency for labelled AKT Data
+```{r}
+#Frequency of center substrate for AKT
+#Very Interesting that there are only two options, with 82% S
+centerAKTpercent <- prop.table(table(AKTlabelled$Center))
+centerAKTTotal <- table(AKTlabelled$Center)
+rbind(centerAKTTotal, centerAKTpercent)
+
+#Frequency of left substrate for AKT
+#Interestingly here that "S" is once again the most popular, it's likely that binding sites with an "S" close to the phosphorylation site are substrates of AKT (obviously in this case since it's labelled) but show a decrease in sensitivity to Insulin (For note -- if you put the key (enzyme) in the lock (substrate) it will fold to better fit the key (kind of like a magnet), even if S isn't the exact phosphorylation site, if it's close it will still fold and lead to a reaction, probably just weaker.
+leftAKTpercent <- sort( round( prop.table(table(AKTlabelled$Left)), 2), decreasing = T)
+leftAKTTotal <- sort(table(AKTlabelled$Left), decreasing = T)
+rbind(leftAKTTotal, leftAKTpercent)
+
+
+#Frequency of right substrate for AKT
+#Worth noting that "S"" isn't frequent, and "F" was top 3 in both.
+rightAKTpercent <- sort( round(prop.table(table(AKTlabelled$Right)),2) , decreasing = T)
+rightAKTTotal <- sort(table(AKTlabelled$Right), decreasing = T)
+rbind(rightAKTTotal, rightAKTpercent)
+```
+
+
+###Looking at Amino Acid Frequency for labelled mTOR Data
+```{r}
+#Frequency of center substrate for mTOR
+#"S" and "T" are once again more likely, with slightly less favour towards "S"
+centermTORpercent <- prop.table(table(mTORlabelled$Center))
+centermTORTotal <- table(mTORlabelled$Center)
+rbind(centermTORTotal, centermTORpercent)
+
+#Frequency of left substrate for mTOR
+#"S" and "T" are once again more likely, with slightly less favour towards "S"
+leftmTORpercent <- sort( round( prop.table(table(mTORlabelled$Left)), 2), decreasing = T)
+leftmTORTotal <- sort(table(mTORlabelled$Left), decreasing = T)
+rbind(leftmTORTotal, leftmTORpercent)
+
+#Frequency of right substrate for AKT
+#"P" is very frequent, more so than either "S" or "T" in the middle, a key find.
+rightmTORpercent <- sort( round(prop.table(table(mTORlabelled$Right)),2) , decreasing = T)
+rightmTORTotal <- sort(table(mTORlabelled$Right), decreasing = T)
+rbind(rightmTORTotal, rightmTORpercent)
+```
+
+#####After realising that "S" and "T" are frequently in the middle of the amino acid sequence, it's worth noting that amino acids can be split into three groups. These groups are important as the amino acids in these groups will exhibit the same folding behavious. 
+######For example when you're cleaning an oily mess, you don't use water... Yeah pretty sure we all know this.
+######Point being, we can group these amino acids into groups, this should reduce the variance and improve our ability to classify the data.
+
+######Charged (side chains often make salt bridges):
+######•	Arginine - Arg - R 
+######•	Lysine - Lys - K 
+######•	Aspartic acid - Asp - D 
+######•	Glutamic acid - Glu - E 
+
+######Polar (usually participate in hydrogen bonds as proton donors or acceptors):
+######•	Glutamine - Gln - Q 
+######•	Asparagine - Asn - N 
+######•	Histidine - His - H 
+######•	Serine - Ser - S 
+######•	Threonine - Thr - T 
+######•	Tyrosine - Tyr - Y 
+######•	Cysteine - Cys - C 
+######•	Tryptophan - Trp - W 
+
+######Hydrophobic (normally buried inside the protein core):
+######•	Alanine - Ala - A 
+######•	Isoleucine - Ile - I 
+######•	Leucine - Leu - L 
+######•	Methionine - Met - M 
+######•	Phenylalanine - Phe - F 
+######•	Valine - Val - V 
+######•	Proline - Pro - P 
+######•	Glycine - Gly - G 
+
+![Caption for the picture.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amino_Acids.svg/624px-Amino_Acids.svg.png)
