@@ -39,18 +39,29 @@ centerAKTpercent <- prop.table(table(AKTlabelled$Center))
 centerAKTTotal <- table(AKTlabelled$Center)
 rbind(centerAKTTotal, centerAKTpercent)
 
+centerGroupAktPercent <- sort(prop.table(round(table(AKTlabelled$CenterGroup), 2)), decreasing = T)
+centerGroupAktTotal <- sort(table(AKTlabelled$CenterGroup), decreasing = T)
+rbind(centerGroupAktTotal, centerGroupAktPercent)
+
 #Frequency of left substrate for AKT
 #Interestingly here that "S" is once again the most popular, it's likely that binding sites with an "S" close to the phosphorylation site are substrates of AKT (obviously in this case since it's labelled) but show a decrease in sensitivity to Insulin (For note -- if you put the key (enzyme) in the lock (substrate) it will fold to better fit the key (kind of like a magnet), even if S isn't the exact phosphorylation site, if it's close it will still fold and lead to a reaction, probably just weaker.
 leftAKTpercent <- sort( round( prop.table(table(AKTlabelled$Left)), 2), decreasing = T)
 leftAKTTotal <- sort(table(AKTlabelled$Left), decreasing = T)
 rbind(leftAKTTotal, leftAKTpercent)
 
+leftGroupAktPercent <- sort(round(prop.table(table(AKTlabelled$LeftGroup)), 2), decreasing = T)
+leftGroupAktTotal <- sort(table(AKTlabelled$LeftGroup), decreasing = T)
+rbind(leftGroupAktTotal, leftGroupAktPercent)
 
 #Frequency of right substrate for AKT
 #Worth noting that "S"" isn't frequent, and "F" was top 3 in both.
 rightAKTpercent <- sort( round(prop.table(table(AKTlabelled$Right)),2) , decreasing = T)
 rightAKTTotal <- sort(table(AKTlabelled$Right), decreasing = T)
 rbind(rightAKTTotal, rightAKTpercent)
+
+rightGroupAKTpercent <- sort( round(prop.table(table(AKTlabelled$RightGroup)),2) , decreasing = T)
+rightGroupAKTTotal <- sort(table(AKTlabelled$RightGroup), decreasing = T)
+rbind(rightGroupAKTTotal, rightGroupAKTpercent)
 ```
 
 
@@ -62,47 +73,152 @@ centermTORpercent <- prop.table(table(mTORlabelled$Center))
 centermTORTotal <- table(mTORlabelled$Center)
 rbind(centermTORTotal, centermTORpercent)
 
+centerGroupmTORpercent <- sort(prop.table(table(mTORlabelled$CenterGroup)), decreasing = T)
+centerGroupmTORTotal <- sort(table(mTORlabelled$CenterGroup), decreasing = T)
+rbind(centerGroupmTORTotal, centerGroupmTORpercent)
+
 #Frequency of left substrate for mTOR
 #"S" and "T" are once again more likely, with slightly less favour towards "S"
 leftmTORpercent <- sort( round( prop.table(table(mTORlabelled$Left)), 2), decreasing = T)
 leftmTORTotal <- sort(table(mTORlabelled$Left), decreasing = T)
 rbind(leftmTORTotal, leftmTORpercent)
 
-#Frequency of right substrate for AKT
+leftGroupmTORpercent <- sort( round( prop.table(table(mTORlabelled$LeftGroup)), 2), decreasing = T)
+leftGroupmTORTotal <- sort(table(mTORlabelled$LeftGroup), decreasing = T)
+rbind(leftGroupmTORTotal, leftGroupmTORpercent)
+
+#Frequency of right substrate for mTOR
 #"P" is very frequent, more so than either "S" or "T" in the middle, a key find.
 rightmTORpercent <- sort( round(prop.table(table(mTORlabelled$Right)),2) , decreasing = T)
 rightmTORTotal <- sort(table(mTORlabelled$Right), decreasing = T)
 rbind(rightmTORTotal, rightmTORpercent)
+
+rightGroupmTORpercent <- sort( round(prop.table(table(mTORlabelled$RightGroup)),2) , decreasing = T)
+rightGroupmTORTotal <- sort(table(mTORlabelled$RightGroup), decreasing = T)
+rbind(rightGroupmTORTotal, rightGroupmTORpercent)
+
 ```
 
 #####After realising that "S" and "T" are frequently in the middle of the amino acid sequence, it's worth noting that amino acids can be split into three groups. These groups are important as the amino acids in these groups will exhibit the same folding behavious. 
 ######For example when you're cleaning an oily mess, you don't use water... Yeah pretty sure we all know this.
 ######Point being, we can group these amino acids into groups, this should reduce the variance and improve our ability to classify the data.
 
-######Charged (side chains often make salt bridges):
-######•	Arginine - Arg - R 
-######•	Lysine - Lys - K 
-######•	Aspartic acid - Asp - D 
-######•	Glutamic acid - Glu - E 
-
-######Polar (usually participate in hydrogen bonds as proton donors or acceptors):
-######•	Glutamine - Gln - Q 
-######•	Asparagine - Asn - N 
-######•	Histidine - His - H 
-######•	Serine - Ser - S 
-######•	Threonine - Thr - T 
-######•	Tyrosine - Tyr - Y 
-######•	Cysteine - Cys - C 
-######•	Tryptophan - Trp - W 
-
-######Hydrophobic (normally buried inside the protein core):
-######•	Alanine - Ala - A 
-######•	Isoleucine - Ile - I 
-######•	Leucine - Leu - L 
-######•	Methionine - Met - M 
-######•	Phenylalanine - Phe - F 
-######•	Valine - Val - V 
-######•	Proline - Pro - P 
-######•	Glycine - Gly - G 
-
 ![Caption for the picture.](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amino_Acids.svg/624px-Amino_Acids.svg.png)
+
+
+###Correlation between different variables
+```{r}
+library(corrgram)
+#Somewhat negative correlation betwen average fold and AUC for AKT
+cor(AKTlabelled$Avg.Fold, AKTlabelled$AUC)
+cor(AKTlabelled$LY, AKTlabelled$AUC)
+cor(AKTlabelled$MK, AKTlabelled$AUC)
+
+#No correlation between fold and AUC for mTOR.
+cor(mTORlabelled$Avg.Fold, mTORlabelled$AUC)
+
+aktNumeric <- AKTlabelled[,17:30]
+
+corrgram(aktNumeric)
+```
+
+
+###Test Model on AKT vs mTOR labelled data only, 90% Cross Validation
+```{r}
+library(caret)
+library(e1071)
+set.seed(24)
+
+#combine both AKT and mTOR labelled datasets
+labelledData <- data[data$Label != 'NULL', ]
+
+#removing the centergroup field as it only has one variable
+#removing other variables as there are too many levels and errors are thrown with new variables
+columnsToUse <- which(colnames(labelledData) %in% c("Label", "LeftGroup", "Center", "RightGroup"))
+columnsToUse <- c(columnsToUse, 17:30)
+labelledData <- labelledData[, columnsToUse]
+
+str(labelledData)
+
+#create 80% cross validation
+indexPartition <- createDataPartition(y = labelledData$Label, p = 0.8)[[1]]
+
+#need to be numeric
+TrainingLabelled <- as.data.frame((lapply(labelledData[indexPartition, ], as.numeric)))
+TestLabelled <- as.data.frame((lapply(labelledData[-indexPartition, ], as.numeric)))
+
+#linear SVM model
+svm.labelled.model <- svm(x = TrainingLabelled[ , -1], y = TrainingLabelled[,1], kernel = 'linear', type = 'C-classification', scale = F)
+
+#prediction on test data
+svm.decisions <- predict(svm.labelled.model, TestLabelled[,-1])
+table(svm.decisions, TestLabelled[,1])
+
+```
+
+
+
+###Random Down-Sampling 100 Models
+```{r}
+set.seed(24)
+
+#create null list
+sampleLists <- list()
+
+#Create two new columns for one vs all
+data$AKT = as.factor( data$Label == "AKT")
+data$mTOR = as.factor( data$Label == 'mTOR')
+
+#For loop to create 100 downsamples
+for (i in 1:100) {
+  
+  down.Sample <- downSample( x = data[, c(-1, -4,-32)], data[ ,31], list = T, yname = 'AKT')
+  
+  sampleLists[[i]] <- down.Sample$x
+  
+}
+
+#build empty list of models
+list.model <- list()
+
+for (j in 1:100) {
+  
+#Convert the dataframe to numeric so SVM can be used
+sampleLists[[j]] <- as.data.frame( lapply(sampleLists[[j]], as.numeric))
+
+#Create model using positive label vs unlabelled.
+svm.model.akt <- svm(x = sampleLists[[j]][ , -29], y = sampleLists[[j]][ , 29], kernel = 'linear', type = 'C-classification', scale = F)
+
+list.model[[j]] <- svm.model.akt
+
+}
+
+#remove the columns for the full dataset
+dataTest <- data[, c(-1, -4,-32)]
+#convert variables to numeric for SVM
+dataTest <- as.data.frame(lapply(dataTest, as.numeric))
+
+#Initialise empty dataframe
+total.decisions <- data.frame()
+
+for (k in 1:100) {
+  
+  test.decisons <- predict(list.model[[k]], dataTest[, -29])
+  
+  total.decisions <- rbind(total.decisions, test.decisons)
+  total.decisions <- as.data.frame(total.decisions)
+  
+}
+
+#find the mean decision for each observation and classify
+final.decisions <- colMeans(total.decisions) >= 1.5
+#final results
+table(final.decisions)
+
+```
+
+
+
+
+
+
